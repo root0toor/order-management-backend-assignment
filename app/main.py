@@ -6,6 +6,7 @@ from app.api.health import router as health_router
 from app.api.orders import router as orders_router
 from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
+from app.scheduler.manager import start_scheduler, stop_scheduler
 
 
 @asynccontextmanager
@@ -13,7 +14,14 @@ async def lifespan(_: FastAPI):
     configure_logging()
     logger = get_logger(__name__)
     logger.info("application_startup", extra={"environment": settings.app_env})
+    
+    # Start scheduler
+    start_scheduler()
+    
     yield
+    
+    # Stop scheduler
+    stop_scheduler()
     logger.info("application_shutdown")
 
 
